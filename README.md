@@ -49,6 +49,23 @@ Carga los datos desde Postgres, realiza un gridsearch manual con XGBoost, regist
 
 ![alt text](image-1.png)
 
+#### Detalle Modelo:
+Inicialmente se exploraron las caracterìsticas que tienen valores ? como missing o null, para evitar que el modelo los vea como string se imputaron por NaN
+
+![alt text](image-7.png)
+
+Las variables con valores NaN se eliminaron del modelo
+![alt text](image-8.png)
+
+La edad se imputo con la mediana del intervalo
+![alt text](image-9.png)
+
+Se revisaron las correlaciones para simplificar las caracterìsticas a variables no tan correlacionadas entre si.
+![alt text](image-10.png)
+
+Se utilizò f1 como metrica dado el desbalance de las clases
+![alt text](image-11.png)
+
 ## 4. 📦 MLflow
 - 📍 URL: http://localhost:5000
 - Se usa como servidor de tracking.
