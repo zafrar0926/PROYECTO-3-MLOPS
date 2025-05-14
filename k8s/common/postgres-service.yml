@@ -1,0 +1,13 @@
+# k8s/common/postgres-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: mlops-proyecto3
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres

@@ -1,0 +1,14 @@
+# k8s/mlflow/mlflow-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+  namespace: mlops-proyecto3
+spec:
+  selector:
+    app: mlflow
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

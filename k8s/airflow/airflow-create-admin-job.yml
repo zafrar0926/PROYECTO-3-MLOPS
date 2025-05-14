@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-create-admin
+  namespace: mlops-proyecto3
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: create-admin
+        image: airflow-allinone:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+        command: ["bash", "-c"]
+        args:
+          - |
+            airflow users create \
+              --username admin \
+              --firstname admin \
+              --lastname admin \
+              --role Admin \
+              --email admin@example.com \
+              --password admin \
+            || echo "   ℹ️ user admin already exists"
+

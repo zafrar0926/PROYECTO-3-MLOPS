@@ -1,0 +1,14 @@
+# k8s/airflow/airflow-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow
+  namespace: mlops-proyecto3
+spec:
+  selector:
+    app: airflow
+  ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

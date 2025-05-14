@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow
+  namespace: mlops-proyecto3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow
+  template:
+    metadata:
+      labels:
+        app: airflow
+    spec:
+      securityContext:
+        fsGroup: 50000
+
+      initContainers:
+      - name: create-admin
+        image: airflow-allinone:latest
+        imagePullPolicy: IfNotPresent
+        command: ["bash", "-c"]
+        args:
+          - |
+            airflow users delete --username admin || true
+            airflow users create \
+              --username admin \
+              --firstname admin \
+              --lastname admin \
+              --role Admin \
+              --email admin@example.com \
+              --password admin && \
+            echo "✅ Admin user created"
+        env:
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+
+      containers:
+      - name: scheduler
+        image: airflow-allinone:latest
+        imagePullPolicy: IfNotPresent
+        command: ["bash", "-c", "exec airflow scheduler"]
+        env:
+          - name: AIRFLOW__CORE__LOAD_EXAMPLES
+            value: "false"
+          - name: AIRFLOW__CORE__DAGS_FOLDER
+            value: "/opt/airflow/dags"
+          - name: AIRFLOW__CORE__EXECUTOR
+            value: "SequentialExecutor"
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+          - name: AIRFLOW_CONN_POSTGRES_DEFAULT
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+          - name: AIRFLOW__CORE__PARALLELISM
+            value: "4"
+          - name: AIRFLOW__CORE__DAG_CONCURRENCY
+            value: "1"
+          - name: AIRFLOW__SCHEDULER__MAX_THREADS
+            value: "2"
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow:5000
+          - name: MLFLOW_S3_ENDPOINT_URL
+            value: http://minio:9000
+          - name: AWS_ACCESS_KEY_ID
+            value: minioadmin
+          - name: AWS_SECRET_ACCESS_KEY
+            value: minioadmin
+        volumeMounts:
+          - name: logs
+            mountPath: /opt/airflow/logs
+          - name: data
+            mountPath: /opt/airflow/data
+
+      - name: webserver
+        image: airflow-allinone:latest
+        imagePullPolicy: IfNotPresent
+        command: ["bash", "-c", "exec airflow webserver --hostname 0.0.0.0 --port 8080"]
+        env:
+          - name: AIRFLOW__CORE__LOAD_EXAMPLES
+            value: "false"
+          - name: AIRFLOW__CORE__DAGS_FOLDER
+            value: "/opt/airflow/dags"
+          - name: AIRFLOW__CORE__EXECUTOR
+            value: "SequentialExecutor"
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+          - name: AIRFLOW_CONN_POSTGRES_DEFAULT
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+          - name: AIRFLOW__WEBSERVER__RBAC
+            value: "True"
+          - name: AIRFLOW__WEBSERVER__AUTHENTICATE
+            value: "True"
+          - name: AIRFLOW__WEBSERVER__AUTH_BACKEND
+            value: airflow.www.fab_security.manager.AuthDb
+          - name: AIRFLOW__LOGGING__REMOTE_LOGGING
+            value: "True"
+          - name: AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER
+            value: s3://mlflow/logs
+          - name: AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID
+            value: minio-s3
+          - name: AIRFLOW__LOGGING__ENCRYPT_S3_LOGS
+            value: "False"
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow:5000
+          - name: MLFLOW_S3_ENDPOINT_URL
+            value: http://minio:9000
+          - name: AWS_ACCESS_KEY_ID
+            value: minioadmin
+          - name: AWS_SECRET_ACCESS_KEY
+            value: minioadmin
+        ports:
+          - name: web
+            containerPort: 8080
+        volumeMounts:
+          - name: logs
+            mountPath: /opt/airflow/logs
+          - name: data
+            mountPath: /opt/airflow/data
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "6Gi"
+
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: mlops-artifacts-pvc
+
+

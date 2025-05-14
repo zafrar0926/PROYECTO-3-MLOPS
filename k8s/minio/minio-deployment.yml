@@ -1,0 +1,45 @@
+# k8s/minio/minio-deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: mlops-proyecto3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      securityContext:
+        runAsUser: 1001
+      containers:
+      - name: minio
+        image: minio/minio:latest
+        args:
+          - server
+          - /data
+        env:
+          - name: MINIO_ACCESS_KEY
+            value: "minioadmin"
+          - name: MINIO_SECRET_KEY
+            value: "minioadmin"
+        ports:
+          - containerPort: 9000
+        volumeMounts:
+          - name: exports
+            mountPath: /data
+        resources:
+          requests:
+            cpu:    "0.25"
+            memory: "256Mi"
+          limits:
+            cpu:    "0.5"
+            memory: "512Mi"
+      volumes:
+        - name: exports
+          persistentVolumeClaim:
+            claimName: mlops-artifacts-pvc

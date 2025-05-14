@@ -1,0 +1,14 @@
+# k8s/minio/minio-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: mlops-proyecto3
+spec:
+  type: ClusterIP
+  selector:
+    app: minio
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: api

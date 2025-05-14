@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-create-bucket
+  namespace: mlops-proyecto3
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+      - name: mc
+        image: bitnami/minio-client:latest
+        command: ["sh", "-c"]
+        args:
+          - |
+            # Configura el alias 'local' para MinIO
+            mc alias set local http://minio.mlops-proyecto3.svc.cluster.local:9000 \
+              minioadmin minioadmin
+
+            # Crea el bucket 'mlflow' si no existe
+            mc mb local/mlflow || echo "Bucket mlflow ya existe"
+
+            echo "✅ Bucket 'mlflow' verificado/creado"
+      restartPolicy: OnFailure

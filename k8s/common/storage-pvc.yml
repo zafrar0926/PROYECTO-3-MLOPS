@@ -1,0 +1,13 @@
+# k8s/common/storage-pvc.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mlops-artifacts-pvc
+  namespace: mlops-proyecto3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard

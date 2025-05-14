@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+mlflow
+boto3
+prometheus-client
+xgboost

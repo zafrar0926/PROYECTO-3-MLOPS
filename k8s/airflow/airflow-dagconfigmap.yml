@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-dags
+  namespace: mlops-proyecto3
+data:
+  example_dag.py: |
+    from airflow import DAG
+    from airflow.operators.bash import BashOperator
+    from datetime import datetime
+
+    with DAG(
+        dag_id="example_dag",
+        start_date=datetime(2025,5,9),
+        schedule_interval="@daily",
+        catchup=False,
+    ) as dag:
+        t1 = BashOperator(task_id="print_date", bash_command="date")
+        t1
+  # Si tienes más DAGs, añádelos aquí igual:
+  # otro_dag.py: |
+  #   <contenido de tu DAG>

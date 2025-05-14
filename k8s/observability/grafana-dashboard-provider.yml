@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provider
+  namespace: mlops-proyecto3
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: 'monitoreo_auto'
+        orgId: 1
+        folder: ''
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards

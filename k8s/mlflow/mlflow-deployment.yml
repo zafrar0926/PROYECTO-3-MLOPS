@@ -1,0 +1,56 @@
+# k8s/mlflow/mlflow-deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+  namespace: mlops-proyecto3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+    spec:
+      containers:
+      - name: mlflow
+        image: bitnami/mlflow:latest
+        command: ["mlflow", "server"]
+        args:
+          - "--backend-store-uri"
+          - "postgresql://mlflow:mlflow@postgres:5432/mlflow"
+          - "--default-artifact-root"
+          - "s3://mlflow/"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "5000"
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            value: "minioadmin"
+          - name: AWS_SECRET_ACCESS_KEY
+            value: "minioadmin"
+          - name: MLFLOW_S3_ENDPOINT_URL
+            value: "http://minio:9000"
+            # Anulamos la var inyectada por el Service para que no rompa el CLI
+          - name: MLFLOW_PORT
+            value: "5000"
+        ports:
+          - name: http
+            containerPort: 5000
+      resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+        #readinessProbe:
+        #  httpGet:
+        #    path: /api/2.0/preview/mlflow/version
+        #    port: 5000
+        #  initialDelaySeconds: 10
+        #  periodSeconds: 5
+

@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-db-init
+  namespace: mlops-proyecto3
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: db-init
+        image: airflow-allinone:latest
+        imagePullPolicy: IfNotPresent
+
+        command: ["bash", "-c"]
+        args:
+          - |
+            airflow db init && \
+            airflow connections create-default-connections && \
+            echo "✅ Airflow DB initialized"
+        env:
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            value: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 300   # borra el Job 5m después de completarse
+

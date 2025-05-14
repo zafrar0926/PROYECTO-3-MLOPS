@@ -1,0 +1,25 @@
+# k8s/inference-api/Dockerfile.inference
+
+FROM python:3.10-slim
+
+# Instala Git (para mlflow/git_utils) y limpia cachés de apt
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Primero copia sólo requirements para aprovechar caché de Docker
+COPY requirements.txt .
+
+# Instala dependencias Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia la app
+COPY inference_app.py .
+
+EXPOSE 8000
+
+# Ejecuta la API
+CMD ["uvicorn", "inference_app:app", "--host", "0.0.0.0", "--port", "8000"]

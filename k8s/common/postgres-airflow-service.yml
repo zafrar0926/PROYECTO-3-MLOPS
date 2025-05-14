@@ -1,0 +1,13 @@
+# k8s/common/postgres-airflow-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-airflow
+  namespace: mlops-proyecto3
+spec:
+  selector:
+    app: postgres-airflow
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
