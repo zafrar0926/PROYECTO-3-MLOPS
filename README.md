@@ -15,7 +15,24 @@ Este proyecto tiene como objetivo construir una plataforma completa de MLOps que
 
 ## 2. 🗂 Estructura de Archivos Principales
 
-<pre> ```plaintext 🗂dags/ ├── raw_to_clean_and_transform.py # DAG ETL que limpia y transforma los datos ├── train_and_register.py # DAG que entrena el modelo y lo registra en MLflow 🗂k8s/ ├── airflow/ # Despliegue de Airflow (deployment, jobs y servicios) ├── common/ # Archivos comunes (PostgreSQL, MinIO) ├── inference-api/ # Dockerfile e implementación de la API de inferencia ├── minio/ # Archivos de despliegue para el servicio MinIO ├── mlflow/ # Archivos de despliegue de MLflow y su servicio ├── observability/ # Configuraciones de Prometheus y Grafana └── namespace.yml # Define el namespace del proyecto recreate_all.sh # Despliegue completo desde cero run_pipelines.sh # Corre los DAGs en secuencia observabilidad.sh # Script para desplegar Prometheus, Grafana y API ``` </pre>
+```
+dags/
+ ├── raw_to_clean_and_transform.py         # DAG ETL que limpia y transforma los datos
+ ├── train_and_register.py                 # DAG que entrena el modelo y lo registra en MLflow
+
+k8s/
+ ├── airflow/                              # Despliegue de Airflow (deployment, jobs y servicios)
+ ├── common/                               # Archivos comunes (PostgreSQL, MinIO)
+ ├── inference-api/                        # Dockerfile e implementación de la API de inferencia
+ ├── minio/                                # Archivos de despliegue para el servicio MinIO
+ ├── mlflow/                               # Archivos de despliegue de MLflow y su servicio
+ ├── observability/                        # Configuraciones de Prometheus y Grafana
+ └── namespace.yml                         # Define el namespace del proyecto
+
+recreate_all.sh                            # Despliegue completo desde cero
+run_pipelines.sh                           # Corre los DAGs en secuencia
+observabilidad.sh                          # Script para desplegar Prometheus, Grafana y API
+```
 
 ## 3. 🛠 Airflow
 
